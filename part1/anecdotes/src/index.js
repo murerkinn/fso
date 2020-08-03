@@ -2,12 +2,24 @@ import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
 const App = (props) => {
-  const [selected, setSelected] = useState(0)
+  const [selected, setSelected] = useState([Math.floor(Math.random() * anecdotes.length)])
+  const [points, setPoints] = useState(Array.apply(null, new Array(props.anecdotes.length)).map(Number.prototype.valueOf,0))
+  const copy = [...points]
 
+  const handleVote = () => {
+    copy[selected] += 1
+    setPoints(copy)
+  }
+  
   return (
     <div>
-      {props.anecdotes[selected]}
-      <button onClick={() => setSelected()}>next anecdote</button>
+      <h1>Anecdote of the Day</h1>
+      <p>{props.anecdotes[selected]}</p>
+      <p>has {points[selected]} votes</p>
+      <button onClick={() => handleVote()}>vote</button>
+      <button onClick={() => setSelected([Math.floor(Math.random() * anecdotes.length)])}>next anecdote</button>
+      <h1>Anecdote with Most Votes</h1>
+      <p>{props.anecdotes[points.indexOf(Math.max(...points))]}</p>
     </div>
   )
 }
@@ -20,5 +32,6 @@ const anecdotes = [
   'Premature optimization is the root of all evil.',
   'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
 ]
+
 
 ReactDOM.render(<App anecdotes={anecdotes} />, document.getElementById('root'))
