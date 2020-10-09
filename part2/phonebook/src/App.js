@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Persons from "./Persons";
 import PersonForm from "./PersonForm"
 import Filter from "./Filter"
+import Notification from "./Notification"
 import contr from "./controller"
 
 const App = () => {
@@ -9,6 +10,21 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterVal, setFilterVal] = useState("");
+  const [message, setMessage] = useState("")
+  const [msgType, setMsgType] = useState("")
+
+  const hook = () => {
+    contr.getAll()
+    .then(res => {
+      setPersons(res.data)
+    })
+  }
+
+  const cbFunc = (childData) => {
+    setMessage(childData.message)
+    setMsgType(childData.type)
+    hook()
+  }
 
   const handleNameChange = (event) => {
     setNewName(event.target.value);
@@ -50,6 +66,15 @@ const App = () => {
       }
     ])
     contr.create({name: newName, number: newNumber})
+    .then(res => {
+      setMsgType("success")
+      setMessage(
+        `Added ${newName}`
+      )
+      setTimeout(() => {
+        setMessage("")
+      }, 5000)
+    })
     setNewName("")
     setNewNumber("")
   }
@@ -63,18 +88,12 @@ const App = () => {
     )
   }
 
-  const hook = () => {
-    contr.getAll()
-    .then(res => {
-      setPersons(res.data)
-    })
-  }
-
   useEffect(hook, [])
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} type={msgType} />
       <Filter filter={filterVal} handleFilterChange={handleFilterChange} />
       <h2>add a new</h2>
       <PersonForm
@@ -85,7 +104,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons persons={filterPersons()} />
+      <Persons persons={filterPersons()} cbFunc={cbFunc} />
     </div>
   );
 };

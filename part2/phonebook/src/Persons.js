@@ -3,10 +3,26 @@ import contr from './controller'
 
 function Persons(props) {
     function del(id){
-        if(window.confirm(`Are you sure that you want to remove this information ?`)) {
-            contr.remove(id)
-            .then(window.location.reload())
-        }
+        contr.getOne(id)
+        .then(res => {
+            if(window.confirm(`Are you sure you want to remove information of ${res.data.name} ?`)) {
+                contr.remove(id)
+                .then(
+                    //window.location.reload()
+                    props.cbFunc({
+                        type: 'success',
+                        message: `Information of ${res.data.name} successfully removed from server`
+                    })
+                )
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            props.cbFunc({
+                type: 'error',
+                message: `Information of the person you are looking for has already been removed from server`
+            })
+        })
     }
     return (
         <div>
